@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
-import SummaryStore from '../stores/SummaryStore.js';
+// import SummaryStore from '../stores/SummaryStore.js';
+import store from '../Store'
 
 class Summary extends Component {
 
@@ -8,24 +9,32 @@ class Summary extends Component {
     super(props);
 
     this.onUpdate = this.onUpdate.bind(this);
+    this.getOwnSummary = this.getOwnSummary.bind(this);
 
-    this.state = {
-      sum: SummaryStore.getSummary()
+    this.state = this.getOwnSummary()
+  }
+
+  getOwnSummary() {
+    let state = store.getState()
+    let sum = 0
+    for (let key in state) {
+      if (state.hasOwnProperty(key)) {
+        sum += state[key]
+      }
     }
+    return {sum}
   }
 
   componentDidMount() {
-    SummaryStore.addChangeListener(this.onUpdate);
+    store.subscribe(this.onUpdate);
   }
 
   componentWillUnmount() {
-    SummaryStore.removeChangeListener(this.onUpdate);
+    store.unsubscribe(this.onUpdate);
   }
 
   onUpdate() {
-    this.setState({
-      sum: SummaryStore.getSummary()
-    })
+    this.setState(this.getOwnSummary())
   }
 
   render() {
