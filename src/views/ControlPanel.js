@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import Counter from './Counter.js';
 import Summary from './Summary.js';
-console.dir(Counter)
-console.dir(Summary)
-// console.dir('panel', Counter,Summary)
+import Test from './Test.js'
+
 const style = {
   margin: '20px'
 };
@@ -18,6 +17,7 @@ class ControlPanel extends Component {
         <Counter caption="Third" />
         <hr/>
         <Summary />
+        <Test />
       </div>
     );
   }

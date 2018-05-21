@@ -1,47 +1,67 @@
-import React, { Component } from 'react';
-
-// import SummaryStore from '../stores/SummaryStore.js';
-import store from '../Store'
+import React, { Component, PropTypes } from 'react';
 
 class Summary extends Component {
-
-  constructor(props) {
-    super(props);
-
-    this.onUpdate = this.onUpdate.bind(this);
-    this.getOwnSummary = this.getOwnSummary.bind(this);
-
-    this.state = this.getOwnSummary()
-  }
-
-  getOwnSummary() {
-    let state = store.getState()
-    let sum = 0
-    for (let key in state) {
-      if (state.hasOwnProperty(key)) {
-        sum += state[key]
-      }
-    }
-    return {sum}
-  }
-
-  componentDidMount() {
-    store.subscribe(this.onUpdate);
-  }
-
-  componentWillUnmount() {
-    store.unsubscribe(this.onUpdate);
-  }
-
-  onUpdate() {
-    this.setState(this.getOwnSummary())
-  }
-
   render() {
+    const sum = this.props.sum;
     return (
-      <div>Total Count: {this.state.sum}</div>
+      <div>Total Count: {sum}</div>
     );
   }
 }
 
-export default Summary;
+Summary.propTypes = {
+  sum: PropTypes.number.isRequired
+};
+
+
+class SummaryContainer extends Component {
+  constructor(props, context) {
+    super(props, context);
+
+    this.onChange = this.onChange.bind(this);
+
+    this.state = this.getOwnState();
+  }
+
+  onChange() {
+    this.setState(this.getOwnState());
+  }
+
+  getOwnState() {
+    const state = this.context.store.getState();
+    let sum = 0;
+    for (const key in state) {
+      if (state.hasOwnProperty(key)) {
+        sum += state[key];
+      }
+    }
+
+    return { sum: sum };
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextState.sum !== this.state.sum;
+  }
+
+  componentDidMount() {
+    this.context.store.subscribe(this.onChange);
+  }
+
+  componentWillUnmount() {
+    this.context.store.unsubscribe(this.onChange);
+  }
+
+  render() {
+    const sum = this.state.sum;
+    return (
+      <Summary sum={sum} />
+    );
+  }
+}
+
+SummaryContainer.contextTypes = {
+  store: PropTypes.object
+}
+
+export default SummaryContainer;
+
